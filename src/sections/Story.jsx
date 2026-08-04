@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { notebook } from '../data/notebook'
 import SectionLabel from '../components/SectionLabel'
 import Pin from '../components/Pin'
@@ -8,8 +8,20 @@ import Pin from '../components/Pin'
  */
 export default function Story() {
   const [activeTab, setActiveTab] = useState(notebook[0].tab)
-
   const activeContent = notebook.find(n => n.tab === activeTab)
+
+  const contentRef = useRef(null)
+  const [height, setHeight] = useState(0)
+
+  useEffect(() => {
+    const el = contentRef.current
+    if (!el) return
+    const observer = new ResizeObserver(() => {
+      setHeight(el.offsetHeight)
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <section id="story" className="py-16 lg:py-24 lg:scroll-mt-20 scroll-mt-36">
@@ -65,24 +77,31 @@ export default function Story() {
 
               {/* Right: Ruled content area */}
               <div 
-                key={activeTab} // triggers re-animation
-                className="flex-1 p-8 lg:p-12 min-h-[300px] anim-rise"
-                role="tabpanel"
+                className="flex-1 overflow-hidden transition-[height] duration-500 ease-out"
+                style={{ height: height > 0 ? `${height}px` : 'auto' }}
               >
-                <h3 className="font-display font-bold text-2xl text-forest-deep mb-6">
-                  {activeContent.tab}
-                </h3>
-                
-                <div className="space-y-6">
-                  {activeContent.lines.map((line, i) => (
-                    <p 
-                      key={i} 
-                      className="text-lg text-ink leading-loose border-b border-sky/40 pb-2 relative"
-                    >
-                      {/* Faint ruled line effect */}
-                      <span className="relative z-10">{line}</span>
-                    </p>
-                  ))}
+                <div ref={contentRef}>
+                  <div 
+                    key={activeTab} // triggers re-animation
+                    className="p-8 lg:p-12 min-h-[300px] anim-rise"
+                    role="tabpanel"
+                  >
+                    <h3 className="font-display font-bold text-2xl text-forest-deep mb-6">
+                      {activeContent.tab}
+                    </h3>
+                    
+                    <div className="space-y-6">
+                      {activeContent.lines.map((line, i) => (
+                        <p 
+                          key={i} 
+                          className="text-lg text-ink leading-loose border-b border-sky/40 pb-2 relative"
+                        >
+                          {/* Faint ruled line effect */}
+                          <span className="relative z-10">{line}</span>
+                        </p>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 

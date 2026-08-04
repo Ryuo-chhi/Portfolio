@@ -9,12 +9,46 @@ import CommandPalette from './CommandPalette'
  */
 export default function Header({ theme, toggleTheme, activeSection }) {
   const [isCommandOpen, setIsCommandOpen] = useState(false)
+  const [isMac, setIsMac] = useState(true) // Default to Mac style
+
+  useEffect(() => {
+    // Detect OS for keyboard shortcut display
+    if (typeof navigator !== 'undefined') {
+      const platform = navigator?.platform || navigator?.userAgent || ''
+      if (platform.toLowerCase().includes('win') || platform.toLowerCase().includes('linux')) {
+        setIsMac(false)
+      }
+    }
+  }, [])
 
   const scrollTo = (id) => {
     const el = document.getElementById(id)
     if (el) {
-      // The scroll-mt handles the header offset
-      el.scrollIntoView({ behavior: 'smooth' })
+      const targetPosition = el.getBoundingClientRect().top + window.scrollY
+      const startPosition = window.scrollY
+      const distance = targetPosition - startPosition
+      const duration = 1200 // Slow, cinematic scroll duration (1.2 seconds)
+      let start = null
+
+      // Cubic easing function for very smooth acceleration and deceleration
+      const easeInOutCubic = (t, b, c, d) => {
+        t /= d / 2
+        if (t < 1) return (c / 2) * t * t * t + b
+        t -= 2
+        return (c / 2) * (t * t * t + 2) + b
+      }
+
+      const animation = (currentTime) => {
+        if (start === null) start = currentTime
+        const timeElapsed = currentTime - start
+        const run = easeInOutCubic(timeElapsed, startPosition, distance, duration)
+        window.scrollTo(0, run)
+        if (timeElapsed < duration) {
+          requestAnimationFrame(animation)
+        }
+      }
+      
+      requestAnimationFrame(animation)
     }
   }
 
@@ -55,14 +89,16 @@ export default function Header({ theme, toggleTheme, activeSection }) {
                 className="h-[36px] px-3 flex items-center justify-center gap-2 text-ink-soft hover:bg-forest/5 hover:text-forest-deep rounded-full transition-colors border border-forest/30 dark:border-sage-soft/30"
                 aria-label="Open command palette"
               >
-                <span className="text-lg mb-[1px]">⌘</span>
-                <span className="text-sm font-mono">K</span>
+                <span className={`text-[15px] font-mono ${!isMac ? 'mr-1' : 'mb-[1px] text-lg'}`}>
+                  {isMac ? '⌘' : 'Ctrl'}
+                </span>
+                <span className="text-[13px] font-mono">K</span>
               </button>
             </div>
           </div>
 
           {/* Nav Pills - horizontally scrolling rail on mobile, row on desktop */}
-          <nav className="flex-1 overflow-x-auto no-scrollbar py-4 -my-4 -mx-6 px-6 lg:mx-0 lg:px-0">
+          <nav className="flex-1 overflow-x-auto lg:overflow-visible no-scrollbar py-4 -my-4 -mx-6 px-6 lg:mx-0 lg:px-0">
             <div className="flex items-center gap-1 lg:justify-end min-w-max">
               {navigation.map((nav) => (
                 <NavPill
@@ -85,8 +121,10 @@ export default function Header({ theme, toggleTheme, activeSection }) {
               className="h-[36px] px-4 flex items-center justify-center gap-3 text-ink-soft hover:bg-forest/5 hover:text-forest-deep rounded-full transition-colors border border-forest/30 dark:border-sage-soft/30"
               aria-label="Open command palette"
             >
-              <span className="text-lg mb-[1px]">⌘</span>
-              <span className="text-sm font-mono">K</span>
+              <span className={`text-[15px] font-mono ${!isMac ? 'mr-1' : 'mb-[1px] text-lg'}`}>
+                {isMac ? '⌘' : 'Ctrl'}
+              </span>
+              <span className="text-[13px] font-mono">K</span>
             </button>
           </div>
 

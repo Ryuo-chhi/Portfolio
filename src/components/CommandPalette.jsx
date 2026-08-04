@@ -15,8 +15,14 @@ export default function CommandPalette({ isOpen, onClose, onSelect }) {
 
   useEffect(() => {
     if (isOpen) {
+      document.body.style.overflow = 'hidden'
       setQuery('')
       setTimeout(() => inputRef.current?.focus(), 50)
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
     }
   }, [isOpen])
 
@@ -80,7 +86,6 @@ export default function CommandPalette({ isOpen, onClose, onSelect }) {
 
         <div className="p-3 bg-sand/50 border-t border-ink/5 flex justify-between items-center text-xs font-mono text-ink-soft">
           <span>esc to close</span>
-          <span className="opacity-30 hover:opacity-100 transition-opacity" title="Konami Code">↑↑↓↓←→←→ba</span>
         </div>
       </div>
     </div>

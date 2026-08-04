@@ -9,8 +9,10 @@ export function useActiveSection() {
     let frame = 0
     const measure = () => {
       frame = 0
-      const probe = (headerRef.current?.getBoundingClientRect().bottom ?? 0) + 12
-      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
+      // Use a proportional probe: 40% of the viewport height.
+      // This ensures that when a section is scrolled into the upper middle of the screen, it activates.
+      const probe = window.innerHeight * 0.4
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10
       if (atBottom) {
         setActive(navigation[navigation.length - 1].id)
         return

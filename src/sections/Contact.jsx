@@ -51,53 +51,57 @@ export default function Contact() {
 
             <form 
               onSubmit={handleSubmit}
-              className="bg-cream rounded-panel p-8 lg:p-12 shadow-lift border border-ink/5 grain"
+              className="bg-cream rounded-[24px] p-8 lg:p-10 shadow-sm border border-ink/5 grain"
             >
-              <h3 className="font-display text-2xl font-bold text-forest-deep mb-8">
+              <h3 className="font-display text-[22px] font-bold text-forest-deep mb-8">
                 Dear {profile.name.split(' ')[0]},
               </h3>
 
-              <div className="space-y-8">
-                <div className="flex flex-col">
-                  <label htmlFor="name" className="text-sm font-mono text-ink-soft font-bold tracking-wide mb-2">My name is</label>
-                  <input 
-                    type="text" 
-                    id="name" 
-                    required
-                    className="bg-transparent border-b-2 border-ink/10 focus:border-forest outline-none py-2 text-ink text-lg transition-colors font-sans"
-                    placeholder="Your name"
-                  />
+              <div className="flex flex-col gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Name field */}
+                  <div className="flex flex-col">
+                    <label htmlFor="name" className="text-[11px] font-mono text-ink-soft/80 font-bold tracking-widest uppercase mb-2">My name is</label>
+                    <input 
+                      type="text" 
+                      id="name" 
+                      required
+                      className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-5 py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans placeholder-ink/30"
+                      placeholder="Mira Sandoval"
+                    />
+                  </div>
+
+                  {/* Email field */}
+                  <div className="flex flex-col">
+                    <label htmlFor="email" className="text-[11px] font-mono text-ink-soft/80 font-bold tracking-widest uppercase mb-2">Write back to</label>
+                    <input 
+                      type="email" 
+                      id="email" 
+                      required
+                      className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-5 py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans placeholder-ink/30"
+                      placeholder="mira@studio.co"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex flex-col">
-                  <label htmlFor="email" className="text-sm font-mono text-ink-soft font-bold tracking-wide mb-2">Write back to</label>
-                  <input 
-                    type="email" 
-                    id="email" 
-                    required
-                    className="bg-transparent border-b-2 border-ink/10 focus:border-forest outline-none py-2 text-ink text-lg transition-colors font-sans"
-                    placeholder="your@email.com"
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label htmlFor="message" className="text-sm font-mono text-ink-soft font-bold tracking-wide mb-2">Here is what I'm building</label>
+                  <label htmlFor="message" className="text-[11px] font-mono text-ink-soft/80 font-bold tracking-widest uppercase mb-2">Here is what I'm building</label>
                   <textarea 
                     id="message" 
                     required
                     rows="4"
-                    className="bg-transparent border-b-2 border-ink/10 focus:border-forest outline-none py-2 text-ink text-lg transition-colors font-sans resize-none"
-                    placeholder="Tell me about your project..."
+                    className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-5 py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans resize-none placeholder-ink/30"
+                    placeholder="We run a small ceramics studio and our order form is held together with tape..."
                   />
                 </div>
               </div>
 
-              <div className="mt-10 flex justify-end">
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <button 
                   type="submit"
-                  className="flex items-center gap-2 px-8 py-3 bg-ember text-stamp font-bold rounded-btn shadow-soft hover:-translate-y-0.5 hover:shadow-lift transition-all duration-300"
+                  className="flex items-center justify-center gap-2.5 px-8 py-3.5 bg-ember text-stamp font-bold rounded-2xl shadow-sm hover:brightness-105 hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
                 >
-                  <span className="text-xl">📨</span>
+                  <span className="text-[20px]">📨</span>
                   Send Message
                 </button>
               </div>

@@ -3,12 +3,14 @@ import { projects } from '../data/projects'
 import SectionLabel from '../components/SectionLabel'
 import Stitch from '../components/Stitch'
 import Robot from '../components/Robot'
+import ProjectModal from '../components/ProjectModal'
 
 /**
  * The projects shelf. A grid of project boxes sitting on a wooden plank.
  */
 export default function Projects() {
   const [hoveredProject, setHoveredProject] = useState(null)
+  const [selectedProject, setSelectedProject] = useState(null)
 
   return (
     <section id="projects" className="py-16 lg:py-24 lg:scroll-mt-20 scroll-mt-36 bg-ink/5">
@@ -33,7 +35,7 @@ export default function Projects() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
           {projects.map((project, i) => (
             <div 
               key={i}
@@ -42,49 +44,46 @@ export default function Projects() {
               onMouseLeave={() => setHoveredProject(null)}
             >
               {/* The Plank (Shelf base) */}
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[110%] md:w-[120%] h-4 z-0 pointer-events-none">
-                <div className="absolute inset-0 bg-bark shadow-soft rounded-t-sm" />
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[86%] h-1 bg-bark-light" />
-              </div>
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[105%] h-3 bg-bark rounded-b-md z-0 pointer-events-none" />
+              <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-[95%] h-2 bg-bark-light rounded-b-md z-0 pointer-events-none" />
 
-              {/* The Box (Card) */}
-              <a 
-                href={project.href}
-                target="_blank"
-                rel="noreferrer"
-                className="relative z-10 flex flex-col h-full bg-cream rounded-card p-6 border border-ink/5 shadow-soft transition-all duration-500 var(--ease-cozy) group-hover:-translate-y-1.5 group-hover:shadow-lift focus-visible"
+              {/* The Box (Card) - Cozy flat design */}
+              <button 
+                onClick={() => setSelectedProject(project)}
+                className="relative z-10 flex flex-col h-full bg-cream rounded-[24px] p-7 md:p-8 border border-ink/5 shadow-sm transition-transform duration-500 ease-out hover:-translate-y-1.5 focus-visible text-left cursor-pointer w-full"
               >
                 {/* Header row */}
-                <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex items-start justify-between gap-4 mb-6">
                   {/* Initial Tile */}
                   <div 
-                    className="w-12 h-12 rounded-lg flex items-center justify-center font-display font-bold text-xl text-stamp shadow-inner transition-transform duration-500 group-hover:-rotate-6"
+                    className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center font-display font-bold text-[22px] text-forest-deep shadow-sm"
                     style={{ backgroundColor: project.hue }}
                   >
                     {project.name.charAt(0)}
                   </div>
+                  
                   {/* Tag pill */}
-                  <div className="px-2 py-1 rounded-full bg-ink/5 text-ink-soft text-xs font-mono font-bold tracking-wide">
+                  <div className="px-3.5 py-1.5 rounded-full bg-forest/10 text-forest-deep text-[11px] uppercase font-mono font-bold tracking-widest">
                     {project.tag}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="font-display font-bold text-xl text-forest-deep group-hover:text-forest transition-colors">
+                <div className="flex items-baseline gap-3 mb-4">
+                  <h3 className="font-display font-bold text-[26px] text-forest-deep">
                     {project.name}
                   </h3>
-                  <span className="text-sm font-mono text-ink/40">{project.year}</span>
+                  <span className="text-sm font-mono text-ink-soft/60">{project.year}</span>
                 </div>
 
-                <p className="text-ink-soft leading-relaxed flex-1 mb-6">
+                <p className="text-ink-soft leading-relaxed flex-1 mb-8 text-[17px] line-clamp-3">
                   {project.blurb}
                 </p>
 
                 <div className="mt-auto">
                   {/* Stack Tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <div className="flex flex-wrap gap-2.5 mb-6">
                     {project.stack.map(tech => (
-                      <span key={tech} className="text-xs font-mono text-ink-soft/70">
+                      <span key={tech} className="px-3 py-1 rounded-full border border-ink/15 text-[12px] font-mono text-ink-soft/80">
                         {tech}
                       </span>
                     ))}
@@ -92,15 +91,21 @@ export default function Projects() {
 
                   <Stitch />
 
-                  <div className="font-mono text-sm text-ember font-bold">
+                  <div className="font-mono text-[13px] text-ember font-bold tracking-widest uppercase mt-6">
                     {project.metric}
                   </div>
                 </div>
-              </a>
+              </button>
             </div>
           ))}
         </div>
 
+        {selectedProject && (
+          <ProjectModal 
+            project={selectedProject} 
+            onClose={() => setSelectedProject(null)} 
+          />
+        )}
       </div>
     </section>
   )
