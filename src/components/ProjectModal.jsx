@@ -1,5 +1,12 @@
 import { useEffect } from 'react'
 
+/**
+ * A modal overlay displaying project details.
+ * 
+ * @param {object} props
+ * @param {object} props.project - The project object to display
+ * @param {function} props.onClose - Function to call to close the modal
+ */
 export default function ProjectModal({ project, onClose }) {
   // Prevent scrolling when modal is open
   useEffect(() => {
@@ -44,7 +51,7 @@ export default function ProjectModal({ project, onClose }) {
           </svg>
         </button>
 
-        <div className="p-8 md:p-12">
+        <div className="p-6 sm:p-8 md:p-12">
           <div className="flex items-center gap-5 mb-8">
             <div 
               className="w-14 h-14 rounded-2xl flex items-center justify-center font-display font-bold text-[24px] text-forest-deep shadow-sm shrink-0"
@@ -53,7 +60,7 @@ export default function ProjectModal({ project, onClose }) {
               {project.name.charAt(0)}
             </div>
             <div>
-              <h2 id="modal-title" className="font-display font-bold text-[28px] text-forest-deep leading-tight">
+              <h2 id="modal-title" className="font-display font-bold text-2xl sm:text-[28px] text-forest-deep leading-tight">
                 {project.name}
               </h2>
               <div className="text-[15px] font-mono text-ink-soft/70 mt-1">{project.year} • {project.tag}</div>
@@ -66,9 +73,9 @@ export default function ProjectModal({ project, onClose }) {
 
           <div className="mb-12">
             <h3 className="text-[13px] font-bold font-mono text-ink/40 uppercase tracking-widest mb-4">Technologies Used</h3>
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap gap-2 sm:gap-2.5">
               {project.stack.map(tech => (
-                <span key={tech} className="px-3.5 py-1.5 rounded-full bg-white/60 border border-ink/10 text-[13px] font-mono text-ink-soft shadow-sm">
+                <span key={tech} className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/60 border border-ink/10 text-xs sm:text-[13px] font-mono text-ink-soft shadow-sm">
                   {tech}
                 </span>
               ))}

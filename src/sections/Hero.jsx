@@ -11,7 +11,7 @@ export default function Hero() {
         <div className="grid lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] gap-12 items-center">
           
           {/* Left: Copy */}
-          <div className="order-2 lg:order-1">
+          <div>
             <h1 className="text-4xl lg:text-5xl font-bold font-display text-forest-deep mb-6">
               Hello <span className="inline-block anim-wave-loop origin-bottom-center">👋</span><br />
               I'm {profile.name}.
@@ -21,16 +21,16 @@ export default function Hero() {
               {profile.tagline}
             </p>
             
-            <div className="flex flex-wrap gap-4 mb-10">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-10">
               <a 
                 href="#projects" 
-                className="px-6 py-3 bg-forest text-cream font-bold rounded-btn shadow-soft hover:-translate-y-0.5 hover:shadow-lift transition-all duration-300 border border-transparent"
+                className="w-full sm:w-auto text-center px-6 py-3 bg-forest text-cream font-bold rounded-btn shadow-soft hover:-translate-y-0.5 hover:shadow-lift transition-all duration-300 border border-transparent"
               >
                 Explore My Workshop
               </a>
               <a 
                 href="#contact" 
-                className="px-6 py-3 bg-cream text-forest-deep font-bold rounded-btn shadow-soft hover:-translate-y-0.5 hover:shadow-lift transition-all duration-300 border border-ink/5"
+                className="w-full sm:w-auto text-center px-6 py-3 bg-cream text-forest-deep font-bold rounded-btn shadow-soft hover:-translate-y-0.5 hover:shadow-lift transition-all duration-300 border border-ink/5"
               >
                 Let's Talk
               </a>
@@ -47,7 +47,7 @@ export default function Hero() {
           </div>
 
           {/* Right: Illustration */}
-          <div className="order-1 lg:order-2 bg-cream rounded-panel p-6 shadow-soft border border-ink/5 relative overflow-hidden grain">
+          <div className="bg-cream rounded-panel p-6 shadow-soft border border-ink/5 relative overflow-hidden grain">
             <WorkshopScene />
           </div>
 

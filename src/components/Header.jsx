@@ -3,12 +3,20 @@ import { navigation } from '../data/navigation'
 import ThemeToggle from './ThemeToggle'
 import NavPill from './NavPill'
 import CommandPalette from './CommandPalette'
+import Pin from './Pin'
+import { profile } from '../data/profile'
 
 /**
  * Sticky header with mobile scrolling rail for navigation.
+ * 
+ * @param {object} props
+ * @param {string} props.theme - Current theme ('light' or 'dark')
+ * @param {function} props.toggleTheme - Function to toggle the theme
+ * @param {string} props.activeSection - The currently active section ID
  */
 export default function Header({ theme, toggleTheme, activeSection }) {
   const [isCommandOpen, setIsCommandOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMac, setIsMac] = useState(true) // Default to Mac style
 
   useEffect(() => {
@@ -52,6 +60,11 @@ export default function Header({ theme, toggleTheme, activeSection }) {
     }
   }
 
+  const handleNavClick = (id) => {
+    setIsMobileMenuOpen(false)
+    scrollTo(id)
+  }
+
   // Keyboard shortcut for command palette
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -66,68 +79,99 @@ export default function Header({ theme, toggleTheme, activeSection }) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-sand/90 backdrop-blur-md pt-4 pb-4 px-6 border-b border-ink/5">
-        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-sand/90 backdrop-blur-md px-6 border-b border-ink/5">
+        <div className="py-4 max-w-6xl mx-auto flex items-center justify-between gap-4">
           
-          {/* Top row on mobile, left on desktop */}
-          <div className="flex items-center justify-between w-full lg:w-auto">
-            {/* Wordmark */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-forest text-cream flex items-center justify-center font-display font-bold text-xl shadow-soft">
-                C
-              </div>
-              <div className="font-display font-bold text-forest-deep text-lg">
-                Chhunhour
-              </div>
+          {/* Wordmark */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-forest text-cream flex items-center justify-center font-display font-bold text-xl shadow-soft shrink-0">
+              {profile.name[0]}
             </div>
+            <div className="font-display font-bold text-forest-deep text-lg">
+              {profile.name}
+            </div>
+          </div>
 
-            {/* Actions for mobile (right side of top row) */}
-            <div className="flex items-center gap-3 lg:hidden">
-              <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-              <button 
-                onClick={() => setIsCommandOpen(true)}
-                className="h-[36px] px-3 flex items-center justify-center gap-2 text-ink-soft hover:bg-forest/5 hover:text-forest-deep rounded-full transition-colors border border-forest/30 dark:border-sage-soft/30"
-                aria-label="Open command palette"
-              >
+          {/* Desktop Nav Pills */}
+          <nav className="hidden lg:flex flex-1 items-center justify-end gap-1">
+            {navigation.map((nav) => (
+              <NavPill
+                key={nav.id}
+                id={nav.id}
+                icon={nav.icon}
+                label={nav.label}
+                isActive={activeSection === nav.id}
+                onClick={() => handleNavClick(nav.id)}
+              />
+            ))}
+          </nav>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
+            <button 
+              onClick={() => setIsCommandOpen(true)}
+              className="h-[36px] w-[36px] lg:w-auto px-0 lg:px-4 flex items-center justify-center gap-2 text-ink-soft hover:bg-forest/5 hover:text-forest-deep rounded-full transition-colors border border-forest/30 dark:border-sage-soft/30"
+              aria-label="Open command palette"
+            >
+              <div className="hidden lg:flex items-center gap-2">
                 <span className={`text-[15px] font-mono ${!isMac ? 'mr-1' : 'mb-[1px] text-lg'}`}>
                   {isMac ? '⌘' : 'Ctrl'}
                 </span>
                 <span className="text-[13px] font-mono">K</span>
-              </button>
-            </div>
-          </div>
+              </div>
+              <div className="flex lg:hidden items-center justify-center">
+                <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </button>
 
-          {/* Nav Pills - horizontally scrolling rail on mobile, row on desktop */}
-          <nav className="flex-1 overflow-x-auto lg:overflow-visible no-scrollbar py-4 -my-4 -mx-6 px-6 lg:mx-0 lg:px-0">
-            <div className="flex items-center gap-1 lg:justify-end min-w-max">
-              {navigation.map((nav) => (
-                <NavPill
-                  key={nav.id}
-                  id={nav.id}
-                  icon={nav.icon}
-                  label={nav.label}
-                  isActive={activeSection === nav.id}
-                  onClick={() => scrollTo(nav.id)}
-                />
-              ))}
-            </div>
-          </nav>
-
-          {/* Actions for desktop */}
-          <div className="hidden lg:flex items-center gap-4">
-            <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-            <button 
-              onClick={() => setIsCommandOpen(true)}
-              className="h-[36px] px-4 flex items-center justify-center gap-3 text-ink-soft hover:bg-forest/5 hover:text-forest-deep rounded-full transition-colors border border-forest/30 dark:border-sage-soft/30"
-              aria-label="Open command palette"
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden h-[36px] w-[36px] flex flex-col items-center justify-center gap-[4px] text-ink-soft hover:bg-forest/5 hover:text-forest-deep rounded-full transition-colors border border-forest/30 dark:border-sage-soft/30"
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMobileMenuOpen}
             >
-              <span className={`text-[15px] font-mono ${!isMac ? 'mr-1' : 'mb-[1px] text-lg'}`}>
-                {isMac ? '⌘' : 'Ctrl'}
-              </span>
-              <span className="text-[13px] font-mono">K</span>
+              <span className={`block w-[14px] h-[2px] bg-current rounded-full transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-[6px]' : ''}`} />
+              <span className={`block w-[14px] h-[2px] bg-current rounded-full transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`} />
+              <span className={`block w-[14px] h-[2px] bg-current rounded-full transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-[6px]' : ''}`} />
             </button>
           </div>
 
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        <div 
+          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-[400px] opacity-100 border-t border-ink/5' : 'max-h-0 opacity-0'}`}
+        >
+          <nav className="flex flex-col py-4 gap-2">
+            {navigation.map((nav) => {
+              const isActive = activeSection === nav.id
+              return (
+                <button
+                  key={nav.id}
+                  onClick={() => handleNavClick(nav.id)}
+                  className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 font-bold ${
+                    isActive 
+                      ? 'bg-forest text-cream shadow-soft translate-x-2' 
+                      : 'text-ink-soft hover:bg-forest/5 hover:text-forest-deep'
+                  }`}
+                >
+                  <div className="relative inline-flex items-center gap-3 pr-2">
+                    <span className="text-xl">{nav.icon}</span>
+                    <span>{nav.label}</span>
+                    {isActive && (
+                      <div className="absolute -top-3 -right-3 z-20 pointer-events-none anim-pin-drop">
+                        <Pin />
+                      </div>
+                    )}
+                  </div>
+                </button>
+              )
+            })}
+          </nav>
         </div>
       </header>
 

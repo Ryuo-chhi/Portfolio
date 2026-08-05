@@ -29,6 +29,19 @@
   --color-pin-halo: #fbf8f1;
   --color-snow: #ffffff;
   --color-cloud: #fdfdfc;
+  --color-pin-highlight: #ffd9a6;
+  
+  --color-blueprint-bg: #1b3a4b;
+  --color-blueprint-paper: #f1eedc;
+  
+  --color-toggle-day-start: #bfe2ff;
+  --color-toggle-day-end: #eaf5ff;
+  --color-toggle-night-start: #1b2a3c;
+  --color-toggle-night-end: #33475e;
+  --color-toggle-cloud: #6d9b86;
+  --color-toggle-crater: #6d8f7c;
+  --color-toggle-sun: #dc8a1e;
+  --color-toggle-moon: #cfe6d6;
 
   --radius-btn: 16px;
   --radius-card: 20px;
@@ -84,6 +97,28 @@ html { scrollbar-width: none; }
 html::-webkit-scrollbar { width: 0; }
 ::selection { background-color: var(--color-ember-soft); color: var(--color-forest-deep); }
 :focus-visible { outline: 2px solid var(--color-forest); outline-offset: 3px; border-radius: 6px; }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Scroll hints */
+.scroll-fade-x {
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+}
+@media (min-width: 1024px) {
+  .scroll-fade-x {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+}
 
 /* Animations */
 @keyframes drift {

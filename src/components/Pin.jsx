@@ -42,7 +42,7 @@ export default function Pin({ className = '' }) {
       {/* Highlight/shine */}
       <path
         d="M10 5.5A2.5 2.5 0 0113.5 4"
-        stroke="#ffd9a6"
+        stroke="var(--color-pin-highlight)"
         strokeWidth="1.5"
         strokeLinecap="round"
       />

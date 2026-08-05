@@ -40,7 +40,7 @@ export default function Projects() {
               {/* The Box (Card) - Cozy flat design */}
               <button 
                 onClick={() => setSelectedProject(project)}
-                className="relative z-10 flex flex-col h-full bg-cream rounded-[24px] p-7 md:p-8 border border-ink/5 shadow-sm transition-transform duration-500 ease-out hover:-translate-y-1.5 focus-visible text-left cursor-pointer w-full"
+                className="relative z-10 flex flex-col h-full bg-cream rounded-[24px] p-5 sm:p-7 md:p-8 border border-ink/5 shadow-sm transition-transform duration-500 ease-out hover:-translate-y-1.5 focus-visible text-left cursor-pointer w-full"
               >
                 {/* Header row */}
                 <div className="flex items-start justify-between gap-4 mb-6">
@@ -59,7 +59,7 @@ export default function Projects() {
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-4">
-                  <h3 className="font-display font-bold text-[26px] text-forest-deep">
+                  <h3 className="font-display font-bold text-2xl sm:text-[26px] text-forest-deep">
                     {project.name}
                   </h3>
                   <span className="text-sm font-mono text-ink-soft/60">{project.year}</span>

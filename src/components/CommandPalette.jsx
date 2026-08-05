@@ -3,6 +3,11 @@ import { navigation } from '../data/navigation'
 
 /**
  * ⌘K overlay menu.
+ * 
+ * @param {object} props
+ * @param {boolean} props.isOpen - Whether the palette is open
+ * @param {function} props.onClose - Function to call to close the palette
+ * @param {function} props.onSelect - Function to call with section ID when a command is selected
  */
 export default function CommandPalette({ isOpen, onClose, onSelect }) {
   const [query, setQuery] = useState('')

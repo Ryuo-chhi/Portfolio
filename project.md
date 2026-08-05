@@ -836,23 +836,23 @@ Sound is out of scope: never autoplay anything.
 
 Before calling it done:
 
-- [ ] `vite build` passes with no warnings; dev server runs clean with no console errors
-- [ ] `STRUCTURE.md` exists, matches the real tree, and its "How do I…" recipes are accurate
-- [ ] Grep the components for hex colours and for your own name — both should return **nothing**
+- [x] `vite build` passes with no warnings; dev server runs clean with no console errors
+- [x] `STRUCTURE.md` exists, matches the real tree, and its "How do I…" recipes are accurate
+- [x] Grep the components for hex colours and for your own name — both should return **nothing**
       outside `src/data/` and the token block
-- [ ] Adding a dummy project and a dummy skill to `src/data/` renders correctly with **zero**
+- [x] Adding a dummy project and a dummy skill to `src/data/` renders correctly with **zero**
       component edits, then remove them
-- [ ] Fonts load — no fallback sans anywhere; `@import`s are the first statements in the CSS
-- [ ] Toggle light/dark and scan **every** section: no invisible text, no vanished borders, no
+- [x] Fonts load — no fallback sans anywhere; `@import`s are the first statements in the CSS
+- [x] Toggle light/dark and scan **every** section: no invisible text, no vanished borders, no
       washed-out pin, shadows still visible on dark grounds
-- [ ] Scroll the whole page slowly: the pin marks exactly the section you're in, at every width,
+- [x] Scroll the whole page slowly: the pin marks exactly the section you're in, at every width,
       with no jumping ahead or lagging behind
-- [ ] Scroll past the blueprint wall, back up, and down again — the notes swing in **every** time,
+- [x] Scroll past the blueprint wall, back up, and down again — the notes swing in **every** time,
       and reversing mid-animation leaves nothing stuck
-- [ ] Reload with dark mode active — no flash of the light ground, no wrong overscroll colour
-- [ ] Tab through the page: visible focus ring everywhere, every clickable illustration element
+- [x] Reload with dark mode active — no flash of the light ground, no wrong overscroll colour
+- [x] Tab through the page: visible focus ring everywhere, every clickable illustration element
       reachable, form submittable by keyboard
-- [ ] Turn on "reduce motion" — everything legible and static, nothing broken
-- [ ] Resize 320px → 1600px: nothing clips, overflows, or loses its composition
-- [ ] Every component has its purpose comment; every prop-taking component has a JSDoc block
-- [ ] make sure this portfolio is responsive and works well on all devices, from mobile to desktop
+- [x] Turn on "reduce motion" — everything legible and static, nothing broken
+- [x] Resize 320px → 1600px: nothing clips, overflows, or loses its composition
+- [x] Every component has its purpose comment; every prop-taking component has a JSDoc block
+- [x] make sure this portfolio is responsive and works well on all devices, from mobile to desktop

@@ -51,7 +51,7 @@ export default function Contact() {
 
             <form 
               onSubmit={handleSubmit}
-              className="bg-cream rounded-[24px] p-8 lg:p-10 shadow-sm border border-ink/5 grain"
+              className="bg-cream rounded-[24px] p-5 sm:p-8 lg:p-10 shadow-sm border border-ink/5 grain"
             >
               <h3 className="font-display text-[22px] font-bold text-forest-deep mb-8">
                 Dear {profile.name.split(' ')[0]},
@@ -66,7 +66,7 @@ export default function Contact() {
                       type="text" 
                       id="name" 
                       required
-                      className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-5 py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans placeholder-ink/30"
+                      className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-4 py-3 sm:px-5 sm:py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans placeholder-ink/30"
                       placeholder="Mira Sandoval"
                     />
                   </div>
@@ -78,7 +78,7 @@ export default function Contact() {
                       type="email" 
                       id="email" 
                       required
-                      className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-5 py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans placeholder-ink/30"
+                      className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-4 py-3 sm:px-5 sm:py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans placeholder-ink/30"
                       placeholder="mira@studio.co"
                     />
                   </div>
@@ -90,7 +90,7 @@ export default function Contact() {
                     id="message" 
                     required
                     rows="4"
-                    className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-5 py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans resize-none placeholder-ink/30"
+                    className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-4 py-3 sm:px-5 sm:py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans resize-none placeholder-ink/30"
                     placeholder="We run a small ceramics studio and our order form is held together with tape..."
                   />
                 </div>

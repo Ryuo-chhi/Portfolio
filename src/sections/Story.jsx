@@ -43,7 +43,7 @@ export default function Story() {
               
               {/* Left rail / Top row of tabs */}
               <div 
-                className="flex lg:flex-col gap-2 p-6 lg:pr-0 overflow-x-auto lg:overflow-visible no-scrollbar lg:w-[220px] shrink-0 border-b lg:border-b-0 lg:border-r border-ink/10"
+                className="flex lg:flex-col gap-2 p-6 pr-12 lg:pr-0 overflow-x-auto lg:overflow-visible no-scrollbar lg:w-[220px] shrink-0 border-b lg:border-b-0 lg:border-r border-ink/10 scroll-fade-x"
                 role="tablist"
                 aria-label="Notebook sections"
               >
@@ -66,7 +66,7 @@ export default function Story() {
                         {item.tab}
                       </button>
                       {isActive && (
-                        <div className="absolute -top-2 -right-2 z-20 pointer-events-none anim-pin-drop hidden lg:block">
+                        <div className="absolute -top-2 -right-2 z-20 pointer-events-none anim-pin-drop">
                           <Pin />
                         </div>
                       )}

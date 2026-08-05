@@ -102,7 +102,7 @@ export default function BlueprintWall() {
       className="py-24 relative overflow-hidden"
     >
       {/* Cyanotype Background with grid */}
-      <div className="absolute inset-0 bg-[#1b3a4b] -z-20" />
+      <div className="absolute inset-0 bg-[var(--color-blueprint-bg)] -z-20" />
       
       {/* 16px minor grid */}
       <div 
@@ -129,7 +129,7 @@ export default function BlueprintWall() {
       <div className="max-w-4xl mx-auto px-6">
         
         {/* Legend */}
-        <div className="inline-block relative bg-[#f1eedc] p-3 shadow-md mb-16 transform -rotate-2">
+        <div className="inline-block relative bg-[var(--color-blueprint-paper)] p-3 shadow-md mb-16 transform -rotate-2">
           {/* Tape */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-ember/80 transform rotate-1 opacity-90 shadow-sm mix-blend-multiply" />
           <div className="font-mono text-xs uppercase tracking-widest text-ink font-bold">

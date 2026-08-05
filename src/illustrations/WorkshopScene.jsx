@@ -662,13 +662,16 @@ function SvgWorkshopScene({ onRobotClick, robotWaving }) {
       </svg>
 
       {/* Bolt sits on the desk — DOM element so it can own focus + click */}
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={onRobotClick}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onRobotClick() }}
         className="absolute left-[24.5%] bottom-[4.5%] w-[11%] transition-transform duration-500 ease-[cubic-bezier(0.33,0.02,0.24,1)] hover:-translate-y-2 focus-visible:-translate-y-2 cursor-pointer"
         aria-label="Say hello to Bolt, the workshop robot"
       >
         <Robot size={0} waving={robotWaving} className="w-full h-auto" />
-      </button>
+      </div>
     </div>
   )
 }
