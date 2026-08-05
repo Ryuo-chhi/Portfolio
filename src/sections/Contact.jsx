@@ -9,12 +9,41 @@ import Robot from '../components/Robot'
  */
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Mock submit
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 8000)
+    setIsSubmitting(true)
+    setError(false)
+
+    const formData = new FormData(e.target)
+    // Needs a valid Web3Forms access key from your environment variables
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || "YOUR_ACCESS_KEY_HERE"
+    formData.append("access_key", accessKey)
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        setSubmitted(true)
+        e.target.reset()
+        setTimeout(() => setSubmitted(false), 8000)
+      } else {
+        console.error("Web3Forms error:", data)
+        setError(true)
+      }
+    } catch (err) {
+      console.error(err)
+      setError(true)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -65,6 +94,7 @@ export default function Contact() {
                     <input 
                       type="text" 
                       id="name" 
+                      name="name"
                       required
                       className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-4 py-3 sm:px-5 sm:py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans placeholder-ink/30"
                       placeholder="Mira Sandoval"
@@ -77,6 +107,7 @@ export default function Contact() {
                     <input 
                       type="email" 
                       id="email" 
+                      name="email"
                       required
                       className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-4 py-3 sm:px-5 sm:py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans placeholder-ink/30"
                       placeholder="mira@studio.co"
@@ -88,6 +119,7 @@ export default function Contact() {
                   <label htmlFor="message" className="text-[11px] font-mono text-ink-soft/80 font-bold tracking-widest uppercase mb-2">Here is what I'm building</label>
                   <textarea 
                     id="message" 
+                    name="message"
                     required
                     rows="4"
                     className="bg-transparent border border-sage/40 focus:border-sage rounded-2xl px-4 py-3 sm:px-5 sm:py-4 text-ink-soft text-[15px] outline-none transition-colors font-sans resize-none placeholder-ink/30"
@@ -99,11 +131,15 @@ export default function Contact() {
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <button 
                   type="submit"
-                  className="flex items-center justify-center gap-2.5 px-8 py-3.5 bg-ember text-stamp font-bold rounded-2xl shadow-sm hover:brightness-105 hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
+                  disabled={isSubmitting}
+                  className="flex items-center justify-center gap-2.5 px-8 py-3.5 bg-ember text-stamp font-bold rounded-2xl shadow-sm hover:brightness-105 hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto disabled:opacity-70 disabled:hover:translate-y-0"
                 >
-                  Send Message
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
               </div>
+              {error && (
+                <p className="text-red-500 text-sm mt-4 text-center">There was an issue sending your message. Please try again later.</p>
+              )}
             </form>
           </div>
 
