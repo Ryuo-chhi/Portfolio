@@ -1,250 +1,674 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense, useEffect } from 'react'
 import Robot from '../components/Robot'
+import { getWorkshopRiveUrl } from '../lib/riveScene'
+
+// Lazy load the Rive scene so that the Rive runtime is code-split
+const RiveWorkshopScene = lazy(() => import('../components/RiveWorkshopScene'))
+const riveUrl = getWorkshopRiveUrl()
 
 /**
  * The main hero room scene.
- * Contains interactive elements: the robot, the mug, the plant.
+ * Dynamically switches to Rive if the workshop.riv file is present.
+ * Otherwise, falls back to the SVG graphic with interactive elements.
  */
-export default function WorkshopScene({ className = '' }) {
-  const [steamIntense, setSteamIntense] = useState(false)
-  const [leafFalling, setLeafFalling] = useState(false)
+export default function WorkshopScene({ className = '', onRobotClick, robotWaving }) {
+  const [loadError, setLoadError] = useState(false)
+  const [isNight, setIsNight] = useState(false)
 
-  const handleMugClick = () => {
-    setSteamIntense(true)
-    setTimeout(() => setSteamIntense(false), 3000)
+  // Track the night theme dynamically for the Rive component
+  useEffect(() => {
+    const checkTheme = () => setIsNight(document.documentElement.classList.contains('night'))
+    checkTheme()
+    
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
+
+  if (riveUrl && !loadError) {
+    return (
+      <div className={`relative w-full aspect-[1.64] max-w-[720px] mx-auto ${className}`}>
+        <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
+          <RiveWorkshopScene 
+            src={riveUrl} 
+            night={isNight}
+            onRobotClick={onRobotClick}
+            onError={() => setLoadError(true)}
+          />
+        </Suspense>
+      </div>
+    )
   }
 
-  const handlePlantClick = () => {
-    if (leafFalling) return
-    setLeafFalling(true)
-    setTimeout(() => setLeafFalling(false), 3500)
+  // Fallback SVG implementation
+  return <SvgWorkshopScene onRobotClick={onRobotClick} robotWaving={robotWaving} />
+}
+
+function SvgWorkshopScene({ onRobotClick, robotWaving }) {
+  const [leaves, setLeaves] = useState([])
+  const [steamy, setSteamy] = useState(false)
+
+  const dropLeaf = () => {
+    const id = Date.now()
+    setLeaves((l) => [
+      ...l,
+      { id, x: 96 + Math.random() * 40, y: 300 + Math.random() * 20 },
+    ])
+    setTimeout(() => setLeaves((l) => l.filter((leaf) => leaf.id !== id)), 3600)
   }
 
-  const handleKeydown = (e, handler) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handler()
-    }
+  const puffSteam = () => {
+    setSteamy(true)
+    setTimeout(() => setSteamy(false), 4200)
   }
 
   return (
-    <div className={`relative w-full aspect-[1.64] max-w-[720px] mx-auto ${className}`}>
+    <div className="relative w-full max-w-[720px] mx-auto">
       <svg
         viewBox="0 0 720 440"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full overflow-visible"
-        aria-hidden="true"
+        className="w-full h-auto"
+        role="img"
+        aria-label="A cozy workshop desk beside a window overlooking mountains, with plants, a coffee mug, monitors and a small robot"
       >
-        {/* Background / Wall */}
-        <rect width="720" height="440" fill="transparent" />
+        <defs>
+          <clipPath id="win">
+            <rect x="410" y="34" width="250" height="168" rx="18" />
+          </clipPath>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--color-sky)" />
+            <stop
+              offset="100%"
+              stopColor="var(--color-ember-soft)"
+              stopOpacity="0.45"
+            />
+          </linearGradient>
+          <linearGradient id="lampLight" x1="0" y1="0" x2="0" y2="1">
+            <stop
+              offset="0%"
+              stopColor="var(--color-ember)"
+              stopOpacity="0.35"
+            />
+            <stop
+              offset="100%"
+              stopColor="var(--color-ember)"
+              stopOpacity="0"
+            />
+          </linearGradient>
+        </defs>
 
-        {/* Window */}
-        <g>
-          {/* Frame Outer */}
-          <rect x="420" y="40" width="220" height="160" rx="8" fill="var(--color-bark)" stroke="var(--color-ink)" strokeWidth="4" />
-          {/* Glass */}
-          <rect x="428" y="48" width="204" height="144" rx="4" fill="var(--color-sky)" stroke="var(--color-ink)" strokeWidth="3" />
-          
-          <g style={{ clipPath: 'url(#window-clip)' }}>
-            {/* Mountains */}
-            <path d="M400 192 L470 120 L550 192 Z" fill="var(--color-sage-soft)" stroke="var(--color-ink)" strokeWidth="2" strokeLinejoin="round" />
-            <path d="M470 120 L505 155 L435 155 Z" fill="var(--color-cream)" stroke="var(--color-ink)" strokeWidth="2" strokeLinejoin="round" />
-            
-            <path d="M510 192 L580 90 L650 192 Z" fill="var(--color-sage)" stroke="var(--color-ink)" strokeWidth="2" strokeLinejoin="round" />
-            <path d="M580 90 L615 140 L545 140 Z" fill="var(--color-cream)" stroke="var(--color-ink)" strokeWidth="2" strokeLinejoin="round" />
-            
-            {/* Clouds */}
-            <path className="anim-drift-slow" d="M450 80 Q460 70 470 80 Q485 75 495 85 Q500 95 490 100 H440 Q430 90 450 80 Z" fill="var(--color-cream)" opacity="0.8" />
-            <path className="anim-drift-fast" d="M550 110 Q560 100 570 110 Q585 105 595 115 Q600 125 590 130 H540 Q530 120 550 110 Z" fill="var(--color-cream)" opacity="0.6" />
-            
-            {/* Bird */}
-            <g className="anim-flyby">
-              <path className="anim-flap" d="M0 0 Q 5 -5 10 0 Q 5 5 0 0 M10 0 Q 15 -5 20 0 Q 15 5 10 0" fill="none" stroke="var(--color-ink)" strokeWidth="2" strokeLinecap="round" />
+        {/* ── wall ─────────────────────────────────────────── */}
+        <rect x="0" y="0" width="720" height="348" fill="var(--color-cream)" />
+
+        {/* ── window ───────────────────────────────────────── */}
+        <g clipPath="url(#win)">
+          <rect x="410" y="34" width="250" height="168" fill="url(#skyGrad)" />
+          {/* far mountains */}
+          <path
+            d="M410 150 L470 82 L520 132 L565 92 L620 150 L660 118 L660 202 L410 202Z"
+            fill="var(--color-sage-soft)"
+            opacity="0.75"
+          />
+          <path
+            d="M410 172 L462 118 L512 168 L560 128 L618 178 L660 152 L660 202 L410 202Z"
+            fill="var(--color-sage)"
+          />
+          {/* snow and clouds keep fixed pale fills — on the night sky, cream
+              resolves to navy and they vanish entirely */}
+          <path
+            d="M455 122 L462 118 L470 128 L462 132Z"
+            fill="var(--color-snow)"
+          />
+          <path
+            d="M553 133 L560 128 L568 139 L560 142Z"
+            fill="var(--color-snow)"
+          />
+          {/* hills */}
+          <path
+            d="M410 186 Q470 168 530 190 T660 184 L660 202 L410 202Z"
+            fill="var(--color-forest)"
+          />
+
+          {/* clouds */}
+          <g className="anim-drift" style={{ animationDuration: "52s" }}>
+            <g fill="var(--color-cloud)" opacity="0.9">
+              <ellipse cx="440" cy="66" rx="22" ry="11" />
+              <ellipse cx="456" cy="60" rx="15" ry="12" />
+              <ellipse cx="426" cy="62" rx="12" ry="9" />
+            </g>
+          </g>
+          <g
+            className="anim-drift"
+            style={{ animationDuration: "78s", animationDelay: "-30s" }}
+          >
+            <g fill="var(--color-cloud)" opacity="0.7">
+              <ellipse cx="500" cy="98" rx="17" ry="8" />
+              <ellipse cx="512" cy="94" rx="12" ry="9" />
             </g>
           </g>
 
-          {/* Window Sill */}
-          <rect x="410" y="196" width="240" height="12" rx="4" fill="var(--color-bark-light)" stroke="var(--color-ink)" strokeWidth="4" />
+          {/* birds */}
+          {[
+            { y: 0, scale: 1, delay: "0s", dur: "26s" },
+            { y: 30, scale: 0.7, delay: "-9s", dur: "34s" },
+          ].map((b) => (
+            <g
+              key={b.delay}
+              className="anim-bird"
+              style={{ animationDelay: b.delay, animationDuration: b.dur }}
+            >
+              <g transform={`translate(430 ${64 + b.y}) scale(${b.scale})`}>
+                <g fill="var(--color-forest-deep)">
+                  <ellipse cx="0" cy="0" rx="5.4" ry="3.1" />
+                  <circle cx="4.6" cy="-1.8" r="2.5" />
+                  <path d="M-4.8 -0.6 L-11 -3 L-9.6 1.6 Z" />
+                </g>
+                <path
+                  d="M6.8 -2 L10.4 -0.8 L6.8 0.4 Z"
+                  fill="var(--color-ember)"
+                />
+                <path
+                  d="M-1.4 -1.8 Q-8 -10 -15 -7.4 Q-8 -2.6 -1.4 -1.8 Z"
+                  fill="var(--color-forest-deep)"
+                  style={{
+                    animation: "bird-flap-l 0.86s ease-in-out infinite",
+                    transformOrigin: "-1.4px -1.8px",
+                  }}
+                />
+                <path
+                  d="M0.6 -1.8 Q-4.4 -11.4 2.4 -12.6 Q4.4 -6.4 0.6 -1.8 Z"
+                  fill="var(--color-forest-deep)"
+                  style={{
+                    animation: "bird-flap-r 0.86s ease-in-out infinite",
+                    transformOrigin: "0.6px -1.8px",
+                  }}
+                />
+              </g>
+            </g>
+          ))}
+        </g>
+        {/* frame */}
+        <rect
+          x="410"
+          y="34"
+          width="250"
+          height="168"
+          rx="18"
+          fill="none"
+          stroke="var(--color-bark)"
+          strokeWidth="7"
+        />
+        <path d="M535 38v160" stroke="var(--color-bark)" strokeWidth="5" />
+        <path d="M414 118h242" stroke="var(--color-bark)" strokeWidth="5" />
+        <rect
+          x="398"
+          y="200"
+          width="274"
+          height="12"
+          rx="6"
+          fill="var(--color-bark-light)"
+        />
+
+        {/* ── shelf with project boxes ─────────────────────── */}
+        <rect
+          x="46"
+          y="112"
+          width="230"
+          height="11"
+          rx="5.5"
+          fill="var(--color-bark)"
+        />
+        <rect
+          x="60"
+          y="76"
+          width="42"
+          height="36"
+          rx="8"
+          fill="var(--color-ember)"
+        />
+        <rect
+          x="66"
+          y="84"
+          width="30"
+          height="4"
+          rx="2"
+          fill="var(--color-stamp)"
+          opacity="0.4"
+        />
+        <rect
+          x="112"
+          y="66"
+          width="34"
+          height="46"
+          rx="8"
+          fill="var(--color-forest)"
+        />
+        <rect
+          x="118"
+          y="76"
+          width="22"
+          height="4"
+          rx="2"
+          fill="var(--color-sage-soft)"
+        />
+        <rect
+          x="156"
+          y="84"
+          width="48"
+          height="28"
+          rx="8"
+          fill="var(--color-sky)"
+          stroke="var(--color-forest-deep)"
+          strokeWidth="2"
+        />
+        <rect
+          x="214"
+          y="72"
+          width="30"
+          height="40"
+          rx="8"
+          fill="var(--color-sage)"
+        />
+        {/* tiny hanging plant on shelf */}
+        <g
+          className="anim-sway"
+          style={{ animationDuration: "9s", transformOrigin: "258px 118px" }}
+        >
+          <path
+            d="M258 112 q-10 16 -4 30 M258 112 q10 14 3 26"
+            stroke="var(--color-sage)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+          />
         </g>
 
-        {/* Shelf */}
+        {/* pinned sticky notes */}
+        <g transform="rotate(-5 320 92)">
+          <rect
+            x="300"
+            y="70"
+            width="44"
+            height="44"
+            rx="4"
+            fill="var(--color-ember-soft)"
+          />
+          <path
+            d="M308 84h28M308 92h22M308 100h26"
+            stroke="var(--color-bark)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            opacity="0.6"
+          />
+        </g>
+        <g transform="rotate(6 348 140)">
+          <rect
+            x="330"
+            y="124"
+            width="36"
+            height="34"
+            rx="4"
+            fill="var(--color-sky)"
+          />
+          <path
+            d="M337 136h22M337 144h16"
+            stroke="var(--color-forest)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            opacity="0.6"
+          />
+        </g>
+
+        {/* ── desk ─────────────────────────────────────────── */}
+        <rect
+          x="30"
+          y="316"
+          width="660"
+          height="20"
+          rx="10"
+          fill="var(--color-bark)"
+        />
+        <rect
+          x="30"
+          y="316"
+          width="660"
+          height="7"
+          rx="3.5"
+          fill="var(--color-bark-light)"
+        />
+        <rect
+          x="84"
+          y="336"
+          width="16"
+          height="86"
+          rx="7"
+          fill="var(--color-bark)"
+        />
+        <rect
+          x="620"
+          y="336"
+          width="16"
+          height="86"
+          rx="7"
+          fill="var(--color-bark)"
+        />
+        <rect x="0" y="420" width="720" height="20" fill="var(--color-sand)" />
+
+        {/* lamp */}
         <g>
-          <rect x="60" y="80" width="260" height="12" rx="4" fill="var(--color-bark)" stroke="var(--color-ink)" strokeWidth="4" />
-          {/* Boxes on shelf */}
-          <rect x="80" y="50" width="40" height="30" rx="2" fill="var(--color-ember)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
-          <rect x="130" y="40" width="20" height="40" rx="2" fill="var(--color-sage)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
-          <rect x="160" y="60" width="50" height="20" rx="2" fill="var(--color-sky)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
-          {/* Books */}
-          <rect x="230" y="30" width="14" height="50" rx="2" fill="var(--color-forest)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" transform="rotate(10 230 80)" />
-          <rect x="250" y="30" width="14" height="50" rx="2" fill="var(--color-sage-soft)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" transform="rotate(15 250 80)" />
+          <path
+            d="M600 316v-58q0-18 -20 -18"
+            stroke="var(--color-forest)"
+            strokeWidth="5"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <path d="M556 226h48l-14 26h-20z" fill="var(--color-ember)" />
+          <path
+            d="M556 258 L604 258 L640 316 L520 316Z"
+            fill="url(#lampLight)"
+            className="anim-glow"
+          />
         </g>
 
-        {/* Hanging Plant */}
-        <g className="anim-sway" style={{ transformOrigin: '330px -10px' }}>
-          <path d="M330 -10 V60" stroke="var(--color-ink)" strokeWidth="2" />
-          <path d="M310 60 Q330 90 350 60 Z" fill="var(--color-forest)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
-          {/* Hanging leaves */}
-          <path d="M315 65 Q310 90 320 110" fill="none" stroke="var(--color-sage)" strokeWidth="4" strokeLinecap="round" />
-          <path d="M345 65 Q350 80 340 100" fill="none" stroke="var(--color-sage)" strokeWidth="4" strokeLinecap="round" />
-        </g>
-
-        {/* Pinned Notes */}
+        {/* ── monitors ───────────────────────────────────────── */}
         <g>
-          <rect x="70" y="140" width="40" height="40" fill="var(--color-ember-soft)" stroke="var(--color-ink)" strokeWidth="2" transform="rotate(-5 90 160)" />
-          <circle cx="85" cy="145" r="3" fill="var(--color-pin-head)" stroke="var(--color-pin-edge)" strokeWidth="1.5" />
-          
-          <rect x="130" y="150" width="45" height="35" fill="var(--color-sky)" stroke="var(--color-ink)" strokeWidth="2" transform="rotate(8 152 167)" />
-          <circle cx="152" cy="155" r="3" fill="var(--color-pin-head)" stroke="var(--color-pin-edge)" strokeWidth="1.5" />
-        </g>
-
-        {/* Desk */}
-        <g>
-          {/* Desk Legs */}
-          <rect x="100" y="280" width="16" height="160" fill="var(--color-bark-light)" stroke="var(--color-ink)" strokeWidth="4" />
-          <rect x="600" y="280" width="16" height="160" fill="var(--color-bark-light)" stroke="var(--color-ink)" strokeWidth="4" />
-          {/* Desk Top */}
-          <rect x="40" y="260" width="640" height="20" rx="4" fill="var(--color-bark)" stroke="var(--color-ink)" strokeWidth="4" />
-        </g>
-
-        {/* Monitor 1 (Main) */}
-        <g>
-          {/* Stand */}
-          <path d="M260 260 L240 210 H320 L300 260 Z" fill="var(--color-ink-soft)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
-          <rect x="220" y="254" width="120" height="6" rx="2" fill="var(--color-ink)" />
-          {/* Screen */}
-          <rect x="140" y="100" width="240" height="140" rx="8" fill="var(--color-ink)" stroke="var(--color-ink)" strokeWidth="4" />
-          {/* Code */}
-          <rect x="150" y="110" width="150" height="8" rx="4" fill="var(--color-sage)" />
-          <rect x="150" y="126" width="100" height="8" rx="4" fill="var(--color-sky)" />
-          <rect x="160" y="142" width="180" height="8" rx="4" fill="var(--color-ember)" />
-          <rect x="160" y="158" width="120" height="8" rx="4" fill="var(--color-cream)" opacity="0.6" />
-          <rect x="150" y="174" width="80" height="8" rx="4" fill="var(--color-sky)" />
-          {/* Caret */}
-          <rect x="238" y="174" width="8" height="10" fill="var(--color-ember)" className="anim-caret" />
-        </g>
-
-        {/* Monitor 2 (Vertical/Tilted) */}
-        <g transform="translate(390, 120) rotate(8)">
-          <path d="M70 140 L60 100 H100 L90 140 Z" fill="var(--color-ink-soft)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
-          <rect x="50" y="136" width="60" height="4" rx="2" fill="var(--color-ink)" />
-          <rect x="30" y="20" width="100" height="140" rx="6" fill="var(--color-ink)" stroke="var(--color-ink)" strokeWidth="4" />
-          {/* Chart */}
-          <rect x="40" y="120" width="16" height="30" rx="2" fill="var(--color-sage)" />
-          <rect x="62" y="90" width="16" height="60" rx="2" fill="var(--color-sky)" />
-          <rect x="84" y="60" width="16" height="90" rx="2" fill="var(--color-ember)" />
-        </g>
-
-        {/* Keyboard */}
-        <g transform="translate(180, 245) rotate(-2)">
-          <rect x="0" y="0" width="160" height="40" rx="4" fill="var(--color-cream)" stroke="var(--color-ink)" strokeWidth="3" />
-          <rect x="10" y="10" width="20" height="20" rx="2" fill="var(--color-ink-soft)" />
-          <rect x="35" y="10" width="20" height="20" rx="2" fill="var(--color-ink-soft)" />
-          <rect x="60" y="10" width="20" height="20" rx="2" fill="var(--color-ember)" />
-          <rect x="85" y="10" width="65" height="20" rx="2" fill="var(--color-ink-soft)" />
-        </g>
-
-        {/* Lamp */}
-        <g>
-          <path d="M520 260 L540 160 L480 100" fill="none" stroke="var(--color-ink)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="520" cy="260" r="14" fill="var(--color-forest-deep)" stroke="var(--color-ink)" strokeWidth="3" />
-          <path d="M480 100 L440 130" stroke="var(--color-ink)" strokeWidth="6" strokeLinecap="round" />
-          <path d="M430 110 L470 150 L450 160 L410 120 Z" fill="var(--color-sage)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
-          {/* Light cone */}
-          <path d="M440 140 L300 260 L480 260 Z" fill="url(#lamp-glow)" className="anim-glow" style={{ mixBlendMode: 'overlay' }} />
-        </g>
-
-        {/* Maker (The human) */}
-        <g>
-          {/* Shoulders / Body */}
-          <path d="M500 440 Q500 320 580 320 Q660 320 660 440 Z" fill="var(--color-forest)" stroke="var(--color-ink)" strokeWidth="4" strokeLinejoin="round" />
-          {/* Head */}
-          <circle cx="580" cy="280" r="45" fill="var(--color-ember-soft)" stroke="var(--color-ink)" strokeWidth="4" />
-          {/* Hair */}
-          <path d="M535 280 Q535 210 580 210 Q625 210 625 280 Q625 240 580 240 Q535 240 535 280 Z" fill="var(--color-ink)" stroke="var(--color-ink)" strokeWidth="2" strokeLinejoin="round" />
-          {/* Glasses */}
-          <rect x="540" y="260" width="30" height="20" rx="4" fill="none" stroke="var(--color-ink)" strokeWidth="3" />
-          <path d="M570 270 H625" stroke="var(--color-ink)" strokeWidth="3" />
-          {/* Eye */}
-          <g className="anim-blink">
-            <circle cx="555" cy="270" r="3" fill="var(--color-ink)" />
+          <g transform="rotate(-8 140 242)">
+            <rect
+              x="88"
+              y="204"
+              width="104"
+              height="78"
+              rx="10"
+              fill="var(--color-forest-deep)"
+            />
+            <rect
+              x="95"
+              y="211"
+              width="90"
+              height="64"
+              rx="6"
+              fill="var(--color-sky)"
+              opacity="0.9"
+            />
+            <path
+              d="M104 258l18-20 14 14 13-18 20 24z"
+              fill="var(--color-sage)"
+              opacity="0.8"
+            />
+            <circle cx="160" cy="226" r="6.5" fill="var(--color-ember)" />
           </g>
-          {/* Arm reaching out */}
-          <path d="M520 340 Q460 360 420 310" fill="none" stroke="var(--color-forest)" strokeWidth="24" strokeLinecap="round" />
-          <path d="M520 340 Q460 360 420 310" fill="none" stroke="var(--color-ink)" strokeWidth="32" strokeLinecap="round" style={{ opacity: 0.1 }} />
-          <path d="M420 310 Q400 290 380 280" fill="none" stroke="var(--color-ember-soft)" strokeWidth="16" strokeLinecap="round" />
+          <path
+            d="M140 282v22"
+            stroke="var(--color-forest-deep)"
+            strokeWidth="11"
+          />
+          <rect
+            x="116"
+            y="304"
+            width="48"
+            height="12"
+            rx="6"
+            fill="var(--color-bark-light)"
+          />
         </g>
 
-        {/* Desk Plant (Interactive) */}
-        <g transform="translate(560, 210)">
-          <path d="M0 50 Q10 10 -20 0" fill="none" stroke="var(--color-sage)" strokeWidth="6" strokeLinecap="round" />
-          <path d="M0 50 Q-10 20 20 10" fill="none" stroke="var(--color-sage)" strokeWidth="6" strokeLinecap="round" />
-          {leafFalling && (
-            <path className="anim-leaffall" d="M20 10 Q30 5 35 15 Q25 20 20 10 Z" fill="var(--color-forest)" />
-          )}
-          {!leafFalling && (
-            <path d="M20 10 Q30 5 35 15 Q25 20 20 10 Z" fill="var(--color-forest)" />
-          )}
-          <rect x="-15" y="50" width="30" height="30" rx="4" fill="var(--color-bark)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
+        <g>
+          <rect
+            x="204"
+            y="176"
+            width="176"
+            height="112"
+            rx="12"
+            fill="var(--color-forest-deep)"
+          />
+          <rect
+            x="212"
+            y="184"
+            width="160"
+            height="96"
+            rx="7"
+            fill="var(--color-ink)" /* Used --color-ink instead of missing --color-screen */
+          />
+          <g
+            fontFamily="var(--font-mono)"
+            fontSize="9"
+            fill="var(--color-sage-soft)"
+          >
+            <text x="222" y="202">
+              const workshop = {"{"}
+            </text>
+            <text x="230" y="216" fill="var(--color-ember-soft)">
+              craft: true,
+            </text>
+            <text x="230" y="230" fill="var(--color-sky)">
+              coffee: 3,
+            </text>
+            <text x="222" y="244">
+              {"}"}
+            </text>
+          </g>
+          <rect
+            x="222"
+            y="252"
+            width="7"
+            height="11"
+            fill="var(--color-ember)"
+            className="anim-caret"
+          />
+          <path
+            d="M292 288v20"
+            stroke="var(--color-forest-deep)"
+            strokeWidth="18"
+          />
+          <rect
+            x="258"
+            y="306"
+            width="68"
+            height="12"
+            rx="6"
+            fill="var(--color-bark-light)"
+          />
         </g>
 
-        {/* Floor Plant */}
-        <g transform="translate(680, 360)">
-          <path d="M0 80 Q-20 20 -40 10" fill="none" stroke="var(--color-sage)" strokeWidth="8" strokeLinecap="round" />
-          <path d="M0 80 Q10 30 20 0" fill="none" stroke="var(--color-sage)" strokeWidth="8" strokeLinecap="round" />
-          <path d="M0 80 Q-5 40 10 30" fill="none" stroke="var(--color-sage)" strokeWidth="8" strokeLinecap="round" />
-          <path d="M-40 10 Q-30 -10 -20 0 Z" fill="var(--color-forest-deep)" />
-          <path d="M20 0 Q35 -5 30 15 Z" fill="var(--color-forest-deep)" />
-          <rect x="-25" y="80" width="50" height="60" rx="8" fill="var(--color-cream)" stroke="var(--color-ink)" strokeWidth="4" strokeLinejoin="round" />
+        {/* keyboard */}
+        <g>
+          <rect
+            x="256"
+            y="318"
+            width="128"
+            height="15"
+            rx="5"
+            fill="var(--color-cream)"
+            stroke="var(--color-forest-deep)"
+            strokeWidth="1.6"
+          />
+          <g fill="var(--color-ember)" opacity="0.8">
+            {Array.from({ length: 11 }).map((_, i) => (
+              <rect
+                key={`k${i}`}
+                x={262 + i * 11}
+                y={321}
+                width="7.5"
+                height="4"
+                rx="1.5"
+              />
+            ))}
+          </g>
+          <g fill="var(--color-forest-deep)" opacity="0.35">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <rect
+                key={`l${i}`}
+                x={266 + i * 11}
+                y={327.5}
+                width="7.5"
+                height="3.5"
+                rx="1.5"
+              />
+            ))}
+          </g>
         </g>
 
-        <defs>
-          <clipPath id="window-clip">
-            <rect x="428" y="48" width="204" height="144" rx="4" />
-          </clipPath>
-          <linearGradient id="lamp-glow" x1="440" y1="140" x2="390" y2="260" gradientUnits="userSpaceOnUse">
-            <stop stopColor="var(--color-ember)" stopOpacity="0.4" />
-            <stop offset="1" stopColor="var(--color-ember)" stopOpacity="0" />
-          </linearGradient>
-        </defs>
+        {/* ── maker ──────────────────────────────────────────── */}
+        {/* <Maker /> - TODO: Create Maker component if needed */}
+
+        {/* ── coffee mug (clickable) ───────────────────────── */}
+        <g
+          onClick={puffSteam}
+          style={{ cursor: "pointer" }}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && puffSteam()}
+          aria-label="Pour more steam into the coffee"
+        >
+          <rect
+            x="514"
+            y="292"
+            width="34"
+            height="28"
+            rx="9"
+            fill="var(--color-cream)"
+            stroke="var(--color-forest-deep)"
+            strokeWidth="2.4"
+          />
+          <path
+            d="M548 300q12 0 12 8t-12 8"
+            stroke="var(--color-forest-deep)"
+            strokeWidth="2.4"
+            fill="none"
+          />
+          <rect
+            x="518"
+            y="304"
+            width="26"
+            height="4"
+            rx="2"
+            fill="var(--color-ember)"
+          />
+          <g
+            stroke="var(--color-ink-soft)"
+            strokeWidth="2.6"
+            strokeLinecap="round"
+            fill="none"
+          >
+            {[0, 1, 2].map((i) => (
+              <path
+                key={i}
+                d={`M${522 + i * 9} 292 q4 -8 0 -14`}
+                style={{
+                  animation: `steam ${
+                    steamy ? 1.8 : 4.5
+                  }s ease-out ${i * 0.55}s infinite`,
+                  transformOrigin: `${522 + i * 9}px 292px`,
+                }}
+              />
+            ))}
+          </g>
+        </g>
+
+        {/* ── floor plant (clickable) ──────────────────────── */}
+        <g
+          onClick={dropLeaf}
+          style={{ cursor: "pointer" }}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && dropLeaf()}
+          aria-label="Shake the plant and drop a leaf"
+        >
+          <path d="M96 420 l6 -52 h44 l6 52z" fill="var(--color-bark)" />
+          <rect
+            x="92"
+            y="360"
+            width="66"
+            height="14"
+            rx="7"
+            fill="var(--color-bark-light)"
+          />
+          <g className="anim-sway" style={{ transformOrigin: "125px 362px" }}>
+            <path
+              d="M125 362 q-34 -22 -30 -62 q30 6 30 62z"
+              fill="var(--color-sage)"
+            />
+            <path
+              d="M125 362 q34 -18 32 -58 q-30 4 -32 58z"
+              fill="var(--color-forest)"
+            />
+            <path
+              d="M125 362 q-4 -46 4 -78 q14 30 -4 78z"
+              fill="var(--color-sage-soft)"
+            />
+          </g>
+        </g>
+
+        {/* desk plant */}
+        <g
+          className="anim-sway"
+          style={{ animationDuration: "8.5s", transformOrigin: "660px 316px" }}
+        >
+          <rect
+            x="644"
+            y="296"
+            width="32"
+            height="22"
+            rx="7"
+            fill="var(--color-ember)"
+          />
+          <path
+            d="M660 296 q-18 -10 -16 -30 q16 6 16 30z"
+            fill="var(--color-sage)"
+          />
+          <path
+            d="M660 296 q18 -8 18 -28 q-18 4 -18 28z"
+            fill="var(--color-forest)"
+          />
+        </g>
+
+        {/* books */}
+        <g>
+          <rect
+            x="586"
+            y="292"
+            width="9"
+            height="26"
+            rx="2.5"
+            fill="var(--color-forest)"
+          />
+          <rect
+            x="597"
+            y="286"
+            width="9"
+            height="32"
+            rx="2.5"
+            fill="var(--color-ember)"
+          />
+          <rect
+            x="608"
+            y="296"
+            width="9"
+            height="22"
+            rx="2.5"
+            fill="var(--color-sky)"
+          />
+        </g>
+
+        {/* falling leaves */}
+        {leaves.map((leaf) => (
+          <path
+            key={leaf.id}
+            d={`M${leaf.x} ${leaf.y} q10 -6 12 4 q-10 6 -12 -4z`}
+            fill="var(--color-sage)"
+            style={{ animation: "leaffall 3.4s ease-in forwards" }}
+          />
+        ))}
       </svg>
-      
-      {/* Interactive overlays positioned over the SVG */}
-      
-      {/* Robot Overlay */}
-      <div className="absolute top-[160px] left-[60px] w-[80px] h-[100px]">
-        <Robot size={80} />
-      </div>
 
-      {/* Mug (Interactive) */}
-      <button 
-        className="absolute top-[215px] left-[450px] w-[34px] h-[55px] cursor-pointer group focus-visible"
-        onClick={handleMugClick}
-        onKeyDown={(e) => handleKeydown(e, handleMugClick)}
-        aria-label="Make coffee steam"
-      >
-        <svg viewBox="0 0 34 55" className="w-full h-full overflow-visible">
-          <g className="steam-group">
-            <path d="M10 20 Q5 10 15 0" fill="none" stroke="var(--color-sky)" strokeWidth="2" strokeLinecap="round" className={steamIntense ? 'anim-steam-fast' : 'anim-steam'} />
-            <path d="M17 20 Q12 10 22 0" fill="none" stroke="var(--color-sky)" strokeWidth="2" strokeLinecap="round" className={`${steamIntense ? 'anim-steam-fast' : 'anim-steam'} steam-delay-1`} />
-            <path d="M24 20 Q19 10 29 0" fill="none" stroke="var(--color-sky)" strokeWidth="2" strokeLinecap="round" className={`${steamIntense ? 'anim-steam-fast' : 'anim-steam'} steam-delay-2`} />
-          </g>
-          <rect x="4" y="25" width="26" height="30" rx="4" fill="var(--color-cream)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
-          <path d="M30 35 Q38 35 38 42 Q38 49 30 49" fill="none" stroke="var(--color-ink)" strokeWidth="3" strokeLinecap="round" />
-        </svg>
-        <div className="absolute -bottom-2 left-2 right-4 h-[2px] bg-ink/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-      </button>
-
-      {/* Plant (Interactive) */}
+      {/* Bolt sits on the desk — DOM element so it can own focus + click */}
       <button
-        className="absolute top-[190px] left-[525px] w-[70px] h-[90px] cursor-pointer group focus-visible"
-        onClick={handlePlantClick}
-        onKeyDown={(e) => handleKeydown(e, handlePlantClick)}
-        aria-label="Drop a leaf"
+        onClick={onRobotClick}
+        className="absolute left-[24.5%] bottom-[4.5%] w-[11%] transition-transform duration-500 ease-[cubic-bezier(0.33,0.02,0.24,1)] hover:-translate-y-2 focus-visible:-translate-y-2 cursor-pointer"
+        aria-label="Say hello to Bolt, the workshop robot"
       >
-        <div className="absolute -bottom-2 left-4 right-4 h-[2px] bg-ink/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        <Robot size={0} waving={robotWaving} className="w-full h-auto" />
       </button>
-
     </div>
   )
 }

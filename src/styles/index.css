@@ -27,6 +27,8 @@
   --color-pin-head: #dc8a1e;
   --color-pin-edge: #3a2a16;
   --color-pin-halo: #fbf8f1;
+  --color-snow: #ffffff;
+  --color-cloud: #fdfdfc;
 
   --radius-btn: 16px;
   --radius-card: 20px;
@@ -85,9 +87,10 @@ html::-webkit-scrollbar { width: 0; }
 
 /* Animations */
 @keyframes drift {
-  from { transform: translateX(-10%); }
-  to { transform: translateX(110%); }
+  from { transform: translateX(-100px); }
+  to { transform: translateX(350px); }
 }
+.anim-drift { animation: drift linear infinite; }
 .anim-drift-fast { animation: drift 52s linear infinite; }
 .anim-drift-slow { animation: drift 78s linear infinite; }
 
@@ -136,12 +139,21 @@ html::-webkit-scrollbar { width: 0; }
   0%, 100% { transform: rotate(-10deg); }
   50% { transform: rotate(15deg); }
 }
+@keyframes bird-flap-l {
+  0%, 100% { transform: rotate(-12deg); }
+  50% { transform: rotate(16deg); }
+}
+@keyframes bird-flap-r {
+  0%, 100% { transform: rotate(12deg); }
+  50% { transform: rotate(-16deg); }
+}
 @keyframes flyby {
-  from { transform: translateX(-10vw) translateY(10px); }
-  to { transform: translateX(110vw) translateY(-20px); }
+  from { transform: translateX(-150px) translateY(10px); }
+  to { transform: translateX(350px) translateY(-20px); }
 }
 .anim-flap { animation: flap 0.9s infinite; transform-origin: center; }
 .anim-flyby { animation: flyby 34s linear infinite; }
+.anim-bird { animation: flyby linear infinite; }
 
 @keyframes leaffall {
   0% { transform: translateY(0) rotate(0) translateX(0); opacity: 1; }

@@ -10,9 +10,11 @@ import { profile } from '../data/profile'
  * @param {boolean} [props.loopWave] Wave forever (footer goodbye).
  * @param {string}  [props.className]
  */
-export default function Robot({ size, waving, loopWave, className = '' }) {
+export default function Robot({ size, waving, loopWave, className = '', interactive = true, overrideSpeech }) {
   const [isClickedWaving, setIsClickedWaving] = useState(false)
-  const [speech, setSpeech] = useState('')
+  const [internalSpeech, setInternalSpeech] = useState('')
+
+  const speech = (isClickedWaving && internalSpeech) ? internalSpeech : overrideSpeech
 
   const actualWaving = waving || isClickedWaving
 
@@ -20,17 +22,17 @@ export default function Robot({ size, waving, loopWave, className = '' }) {
     if (isClickedWaving) {
       const timer = setTimeout(() => {
         setIsClickedWaving(false)
-        setSpeech('')
+        setInternalSpeech('')
       }, 4200) // 1.4s * 3 waves
       return () => clearTimeout(timer)
     }
   }, [isClickedWaving])
 
   const handleClick = () => {
-    if (loopWave || isClickedWaving) return
+    if (!interactive || loopWave || isClickedWaving) return
     setIsClickedWaving(true)
     const lines = profile.robot.lines
-    setSpeech(lines[Math.floor(Math.random() * lines.length)])
+    setInternalSpeech(lines[Math.floor(Math.random() * lines.length)])
   }
 
   const height = size ? (size * 116) / 100 : undefined
@@ -43,57 +45,99 @@ export default function Robot({ size, waving, loopWave, className = '' }) {
     >
       <button
         onClick={handleClick}
-        className="w-full h-full block focus-visible text-left p-0 cursor-pointer"
-        aria-label="Say hello to Sequel the robot"
+        disabled={!interactive}
+        className={`w-full h-full block focus-visible text-left p-0 ${interactive ? 'cursor-pointer' : 'cursor-default'}`}
+        aria-label={interactive ? "Say hello to Bolt the robot" : "Bolt the robot"}
       >
         <svg
           viewBox="0 0 100 116"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
           className="w-full h-full"
           role="img"
           aria-hidden="true"
         >
-          {/* Antenna */}
-          <line x1="50" y1="22" x2="50" y2="4" stroke="var(--color-ink)" strokeWidth="3" strokeLinecap="round" />
-          <circle cx="50" cy="4" r="4" fill="var(--color-ember)" className="anim-glow" />
-          
-          {/* Body */}
-          <path d="M30 65 Q50 55 70 65 L75 110 L25 110 Z" fill="var(--color-cream)" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
-          
-          {/* Head */}
-          <rect x="25" y="22" width="50" height="46" rx="20" fill="var(--color-sage)" stroke="var(--color-ink)" strokeWidth="3" />
-          
-          {/* Visor */}
-          <rect x="33" y="32" width="34" height="20" rx="8" fill="var(--color-ink)" />
-          
-          {/* Eyes */}
+          {/* antenna */}
+          <path
+            d="M50 22V12"
+            stroke="var(--color-bark)"
+            strokeWidth="3.4"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <circle cx="50" cy="9" r="5" fill="var(--color-ember)" className="anim-glow" />
+
+          {/* head */}
+          <rect
+            x="20"
+            y="20"
+            width="60"
+            height="46"
+            rx="18"
+            fill="var(--color-sage)"
+            stroke="var(--color-forest-deep)"
+            strokeWidth="2.6"
+          />
+          {/* visor */}
+          <rect x="27" y="29" width="46" height="26" rx="12" fill="var(--color-forest-deep)" />
           <g className="anim-blink">
-            <circle cx="42" cy="42" r="3" fill="var(--color-sky)" />
-            <circle cx="58" cy="42" r="3" fill="var(--color-sky)" />
+            <circle cx="40" cy="42" r="4.4" fill="var(--color-sky)" />
+            <circle cx="60" cy="42" r="4.4" fill="var(--color-sky)" />
+          </g>
+          {/* cheeks */}
+          <ellipse cx="26" cy="52" rx="4" ry="2.6" fill="var(--color-ember-soft)" opacity="0.8" />
+          <ellipse cx="74" cy="52" rx="4" ry="2.6" fill="var(--color-ember-soft)" opacity="0.8" />
+
+          {/* body */}
+          <rect
+            x="27"
+            y="68"
+            width="46"
+            height="36"
+            rx="14"
+            fill="var(--color-cream)"
+            stroke="var(--color-forest-deep)"
+            strokeWidth="2.6"
+          />
+          <rect x="38" y="78" width="24" height="10" rx="5" fill="var(--color-sage-soft)" />
+          <circle cx="50" cy="96" r="2.6" fill="var(--color-ember)" />
+
+          {/* left arm */}
+          <path
+            d="M27 78c-7 2-10 7-10 13"
+            stroke="var(--color-forest-deep)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+          />
+          {/* waving arm */}
+          <g className={waveClass} style={{ transformOrigin: '73px 78px' }}>
+            <path
+              d="M73 78c8-1 13-7 14-15"
+              stroke="var(--color-forest-deep)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <circle
+              cx="88"
+              cy="60"
+              r="5.2"
+              fill="var(--color-ember)"
+              stroke="var(--color-forest-deep)"
+              strokeWidth="2"
+            />
           </g>
 
-          {/* Cheeks */}
-          <circle cx="33" cy="52" r="2.5" fill="var(--color-ember)" opacity="0.6" />
-          <circle cx="67" cy="52" r="2.5" fill="var(--color-ember)" opacity="0.6" />
-
-          {/* Left Arm (static) */}
-          <path d="M30 75 Q20 85 24 95" stroke="var(--color-ink)" strokeWidth="4" strokeLinecap="round" />
-          
-          {/* Right Arm (waving) */}
-          <g className={waveClass} style={{ transformOrigin: '70% 75%' }}>
-            <path d="M70 75 Q85 65 78 50" stroke="var(--color-ink)" strokeWidth="4" strokeLinecap="round" fill="none" />
-            {/* Hand */}
-            <circle cx="78" cy="50" r="4" fill="var(--color-sage)" stroke="var(--color-ink)" strokeWidth="2" />
-          </g>
+          {/* feet */}
+          <rect x="32" y="103" width="13" height="7" rx="3.5" fill="var(--color-bark)" />
+          <rect x="55" y="103" width="13" height="7" rx="3.5" fill="var(--color-bark)" />
         </svg>
       </button>
 
       {/* Speech Bubble */}
       {speech && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[160px] bg-cream text-ink-soft text-sm font-sans p-3 rounded-card shadow-soft z-50 text-center anim-rise">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[220px] bg-sky text-forest-deep font-bold text-sm font-sans p-3 rounded-card shadow-sm z-50 text-center anim-rise border border-ink/10">
           {speech}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-4 border-transparent border-t-cream"></div>
+          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-4 border-transparent border-t-sky"></div>
         </div>
       )}
       

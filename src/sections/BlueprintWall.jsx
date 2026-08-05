@@ -150,14 +150,13 @@ export default function BlueprintWall() {
 
           <div className="space-y-16 lg:space-y-24">
             {experience.map((exp, i) => (
-              <div 
-                key={i} 
-                data-note={i}
-                id={`note-${i}`}
-                className="relative bg-cream rounded-sm p-6 lg:p-8 shadow-lift max-w-2xl transition-all duration-700 ease-[var(--ease-cozy)]"
-                style={{ transformOrigin: '2% 8%' }}
-              >
-                {/* The Tack */}
+              <div key={i} data-note={i} className="relative">
+                <div 
+                  id={`note-${i}`}
+                  className="relative bg-cream rounded-sm p-6 lg:p-8 shadow-lift max-w-2xl transition-all duration-700 ease-[var(--ease-cozy)]"
+                  style={{ transformOrigin: '2% 8%' }}
+                >
+                  {/* The Tack */}
                 <div className="absolute -left-6 lg:-left-10 top-8 w-2 h-2 rounded-full bg-pin-head shadow-sm border border-pin-edge z-10" />
                 {/* The short thread to the note */}
                 <div className="absolute -left-5 lg:-left-9 top-9 w-5 lg:w-9 h-px bg-white/60 -z-10" />
@@ -195,6 +194,7 @@ export default function BlueprintWall() {
                   <div className="absolute bottom-0 right-0 w-0 h-0 border-b-[32px] border-l-[32px] border-b-sand border-l-transparent transition-all duration-300 group-hover:border-b-[48px] group-hover:border-l-[48px] shadow-[-2px_-2px_4px_rgba(0,0,0,0.05)]" />
                 </div>
               </div>
+            </div>
             ))}
           </div>
         </div>

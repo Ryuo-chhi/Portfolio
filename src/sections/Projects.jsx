@@ -9,7 +9,6 @@ import ProjectModal from '../components/ProjectModal'
  * The projects shelf. A grid of project boxes sitting on a wooden plank.
  */
 export default function Projects() {
-  const [hoveredProject, setHoveredProject] = useState(null)
   const [selectedProject, setSelectedProject] = useState(null)
 
   return (
@@ -22,15 +21,8 @@ export default function Projects() {
             <h2 className="text-3xl font-bold font-display text-forest-deep">The Shelf</h2>
           </div>
           <div className="hidden lg:block relative" aria-hidden="true">
-            {/* The robot points out the hovered project */}
             <div className="absolute bottom-0 right-0 w-[60px]">
               <Robot size={60} />
-              {hoveredProject && (
-                <div className="absolute bottom-full right-full mb-2 w-[140px] bg-cream text-ink-soft text-sm font-sans p-2 rounded-card shadow-soft text-center anim-rise">
-                  Ah, {hoveredProject.name}. Good one.
-                  <div className="absolute top-full right-4 w-0 h-0 border-4 border-transparent border-t-cream"></div>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -40,8 +32,6 @@ export default function Projects() {
             <div 
               key={i}
               className="relative group flex flex-col h-full"
-              onMouseEnter={() => setHoveredProject(project)}
-              onMouseLeave={() => setHoveredProject(null)}
             >
               {/* The Plank (Shelf base) */}
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[105%] h-3 bg-bark rounded-b-md z-0 pointer-events-none" />

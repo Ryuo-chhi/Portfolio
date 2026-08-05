@@ -101,7 +101,6 @@ export default function Contact() {
                   type="submit"
                   className="flex items-center justify-center gap-2.5 px-8 py-3.5 bg-ember text-stamp font-bold rounded-2xl shadow-sm hover:brightness-105 hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
                 >
-                  <span className="text-[20px]">📨</span>
                   Send Message
                 </button>
               </div>
