@@ -1,11 +1,12 @@
 import Pin from './Pin'
+import Icon from './Icon'
 
 /**
  * A navigation button, tracking its active state with a pinned treatment.
  * 
  * @param {object} props
  * @param {string} props.id - The section id to navigate to
- * @param {string} props.icon - The emoji icon
+ * @param {string} props.icon - The icon name
  * @param {string} props.label - The text label
  * @param {boolean} props.isActive - Whether this section is currently active
  * @param {function} props.onClick - Click handler
@@ -24,7 +25,7 @@ export default function NavPill({ id, icon, label, isActive, onClick }) {
           }
         `}
       >
-        <span>{icon}</span>
+        <Icon name={icon} className="w-4 h-4 shrink-0" />
         <span>{label}</span>
       </button>
 

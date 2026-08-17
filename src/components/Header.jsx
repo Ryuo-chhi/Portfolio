@@ -4,6 +4,7 @@ import ThemeToggle from './ThemeToggle'
 import NavPill from './NavPill'
 import CommandPalette from './CommandPalette'
 import Pin from './Pin'
+import Icon from './Icon'
 import { profile } from '../data/profile'
 
 /**
@@ -160,7 +161,7 @@ export default function Header({ theme, toggleTheme, activeSection }) {
                   }`}
                 >
                   <div className="relative inline-flex items-center gap-3 pr-2">
-                    <span className="text-xl">{nav.icon}</span>
+                    <Icon name={nav.icon} className="w-5 h-5 shrink-0" />
                     <span>{nav.label}</span>
                     {isActive && (
                       <div className="absolute -top-3 -right-3 z-20 pointer-events-none anim-pin-drop">

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { navigation } from '../data/navigation'
+import Icon from './Icon'
 
 /**
  * ⌘K overlay menu.
@@ -78,7 +79,9 @@ export default function CommandPalette({ isOpen, onClose, onSelect }) {
                 className="w-full flex items-center justify-between p-3 rounded-card hover:bg-forest/5 text-left transition-colors group focus-visible:bg-forest/5"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">{nav.icon}</span>
+                  <div className="w-8 h-8 rounded-lg bg-forest/10 flex items-center justify-center text-forest-deep group-hover:bg-forest group-hover:text-cream transition-colors shrink-0">
+                    <Icon name={nav.icon} className="w-4 h-4" />
+                  </div>
                   <span className="font-bold text-forest-deep">{nav.label}</span>
                 </div>
                 <span className="text-sm font-mono text-ink-soft group-hover:text-forest transition-colors">

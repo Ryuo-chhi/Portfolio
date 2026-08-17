@@ -1,5 +1,6 @@
 import { profile } from '../data/profile'
 import WorkshopScene from '../illustrations/WorkshopScene'
+import Icon from '../components/Icon'
 
 /**
  * The hero section. Asymmetric split with copy left and the interactive workshop scene right.
@@ -13,7 +14,7 @@ export default function Hero() {
           {/* Left: Copy */}
           <div>
             <h1 className="text-4xl lg:text-5xl font-bold font-display text-forest-deep mb-6">
-              Hello <span className="inline-block anim-wave-loop origin-bottom-center">👋</span><br />
+              Hello <span className="inline-flex align-middle text-ember anim-wave-loop origin-bottom-center ml-1"><Icon name="wave" className="w-9 h-9 lg:w-11 lg:h-11 inline-block" /></span><br />
               I'm {profile.name}.
             </h1>
             

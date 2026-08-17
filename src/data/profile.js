@@ -24,6 +24,6 @@ export const profile = {
   },
   contact: {
     invitation: "Got a project, an idea, or just want to talk full-stack — send it over. I read everything, usually reply within a day.",
-    confirmation: 'Sealed and handed to Sequel. Talk soon 🌿',
+    confirmation: 'Sealed and handed to Sequel. Talk soon.',
   },
 }

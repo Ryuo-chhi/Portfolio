@@ -10,7 +10,7 @@ import { profile } from '../data/profile'
  * @param {boolean} [props.loopWave] Wave forever (footer goodbye).
  * @param {string}  [props.className]
  */
-export default function Robot({ size, waving, loopWave, className = '', interactive = true, overrideSpeech }) {
+export default function Robot({ size, waving, loopWave, className = '', interactive = true, overrideSpeech, bubbleAlign = 'center' }) {
   const [isClickedWaving, setIsClickedWaving] = useState(false)
   const [internalSpeech, setInternalSpeech] = useState('')
 
@@ -37,6 +37,14 @@ export default function Robot({ size, waving, loopWave, className = '', interact
 
   const height = size ? (size * 116) / 100 : undefined
   const waveClass = loopWave ? 'anim-wave-loop' : (actualWaving ? 'anim-wave-3' : '')
+
+  const bubblePositionClass = bubbleAlign === 'left' 
+    ? 'left-0 text-left'
+    : (bubbleAlign === 'right' ? 'right-0 text-right' : 'left-1/2 -translate-x-1/2 text-center')
+
+  const arrowPositionClass = bubbleAlign === 'left'
+    ? 'left-6'
+    : (bubbleAlign === 'right' ? 'right-6' : 'left-1/2 -translate-x-1/2')
 
   return (
     <div 
@@ -135,9 +143,9 @@ export default function Robot({ size, waving, loopWave, className = '', interact
 
       {/* Speech Bubble */}
       {speech && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[220px] bg-sky text-forest-deep font-bold text-sm font-sans p-3 rounded-card shadow-sm z-50 text-center anim-rise border border-ink/10">
+        <div className={`absolute bottom-full ${bubblePositionClass} mb-2 w-max max-w-[210px] bg-sky text-forest-deep font-bold text-xs sm:text-sm font-sans p-3 rounded-2xl shadow-lift z-50 anim-rise border border-ink/10`}>
           {speech}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-4 border-transparent border-t-sky"></div>
+          <div className={`absolute top-full ${arrowPositionClass} w-0 h-0 border-[6px] border-transparent border-t-sky`}></div>
         </div>
       )}
       
